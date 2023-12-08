@@ -9,14 +9,13 @@ from rest_framework.response import Response
 from .serializers import FileSerializer
 
 
-# Create your views here.
+
 def createJson(request):
-    context = parse('/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/')
+    path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/'
+    context = parse(path)
     
     return JsonResponse(context)
 
-
-# views.py
 
 def uploadFile(request):
     if request.method == 'POST':
@@ -34,6 +33,7 @@ def uploadFile(request):
     return render(request, 'upload.html', context)
 
 
+#Upload using API
 class FileUploadViewSet(viewsets.ViewSet):
 
     def create(self, request):
@@ -46,6 +46,8 @@ class FileUploadViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_201_CREATED)
 
 def handle_uploaded_file(f):
-    with open(f.name, 'wb+') as destination:
+    destination_directory = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/'
+    destination_path = destination_directory + f.name
+    with open(destination_path, 'wb+') as destination:
         for chunk in f.chunks():
             destination.write(chunk)
