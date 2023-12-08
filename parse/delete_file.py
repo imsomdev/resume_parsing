@@ -1,5 +1,3 @@
-import os
-
-def delete(filename):
-    file_path = f'/path_to_folder/{filename}'
-    os.remove(file_path)
+import os, shutil
+def delete(path):
+    shutil.rmtree(path)
