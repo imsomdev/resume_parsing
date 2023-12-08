@@ -5,38 +5,40 @@ from openai import OpenAI
 import json
 
 os.environ["OPENAI_API_KEY"] = "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"
-
-def parse(file_content):
-    def pdf_parse(content):
+def parse(path):
+    def pdf_parse(file_path):
         text = ''
-        with pdfplumber.open(content) as pdf:
+        with pdfplumber.open(file_path) as pdf:
             pages = pdf.pages
             for page in pages:
                 text += page.extract_text()
         return text
 
-    def docx_parse(content):
-        text = docx2txt.process(content)
+    def docx_parse(file_path):
+        text = docx2txt.process(file_path)
         return text
 
-    def process_files(file_content):
+    def process_files_in_folder(path):
         dump = []
+        for filename in os.listdir(path):
+            file_path = os.path.join(path, filename)
 
-        base_name, file_extension = os.path.splitext(file_content.filename)
-        if file_extension.lower() == ".pdf":
-            dump.append(pdf_parse(file_content))
-        elif file_extension.lower() == ".docx":
-            dump.append(docx_parse(file_content))
-
+            if os.path.isfile(file_path):
+                base_name, file_extension = os.path.splitext(filename)
+                if file_extension.lower() == ".pdf":
+                    dump.append(pdf_parse(file_path))
+                elif file_extension.lower() == ".docx":
+                    dump.append(docx_parse(file_path))
         return dump
 
+    # path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/test2'
+    result = process_files_in_folder(path)
 
-    result = process_files(file_content)
 
     client = OpenAI()
     api = os.environ.get("OPENAI_API_KEY")
 
-    rewrites = []
+    # temp_cv_list = []
     for element in result:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-1106",
@@ -46,6 +48,4 @@ def parse(file_content):
                 {"role": "user", "content": element}
             ]
         )
-        rewrites.append(json.loads(response.choices[0].message.content))
-
-    return rewrites
+    return json.loads(response.choices[0].message.content)
