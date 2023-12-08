@@ -20,7 +20,7 @@ def uploadFile(request):
         # print(file_name)
         if form.is_valid():
             form.save()
-        # return redirect ('createJson')
+        return redirect ('createJson')
     else:
         form = UploadForm()
     context = {
