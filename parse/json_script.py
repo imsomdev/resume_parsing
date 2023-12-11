@@ -4,7 +4,7 @@ import docx2txt
 from openai import OpenAI
 import json
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 def parse(path):
     def pdf_parse(file_path):
         text = ''
