@@ -5,7 +5,7 @@ from openai import OpenAI
 from datetime import datetime
 import json
 
-os.environ["OPENAI_API_KEY"] = "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"
+os.environ["OPENAI_API_KEY"] = "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"
 def parse(path):
     def pdf_parse(file_path):
         text = ''
@@ -53,7 +53,7 @@ def parse(path):
         )
     res = response.choices[0].message.content
     json_res = json.loads(res)
-    print(json_res)
+    # print(json_res)
     # Using json_data and target key found date_of_birth
     def find_key_value(data, target_key):
         if isinstance(data, dict):
@@ -79,10 +79,10 @@ def parse(path):
         return age
     
     # Validating basic details
-    basic_target_key_list = ['name', 'email', 'phone']
-    for target_key in basic_target_key_list:
-        if find_key_value(json_res, target_key) is None:
-            return ['404',f'{target_key.capitalize()}']
+    basic_target_key_list = ['name', 'email', 'phone', 'address', 'education']
+    for basic_key in basic_target_key_list:
+        if find_key_value(json_res, basic_key) is None:
+            return ['404', f'{basic_key.capitalize()}']
 
     target_key = 'dateOfBirth'
     dob = find_key_value(json_res, target_key)
@@ -93,5 +93,5 @@ def parse(path):
     # Validating age here
     if age <18:
         return '400_AGE'
-    return json_res
+    return [json_res]
 
