@@ -4,7 +4,7 @@ import docx2txt
 from openai import OpenAI
 from datetime import datetime
 import json
-
+os.environ["OPENAI_API_KEY"] = "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"
 
 def parse(path):
     # Extract text from pdf
@@ -57,6 +57,8 @@ def parse(path):
         )
     res = response.choices[0].message.content
     json_res = json.loads(res)
+
+
     print(json_res)
     # Using json_data and target key found that value is present or not
     def find_key_value(data, target_key):

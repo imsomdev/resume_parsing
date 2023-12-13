@@ -7,8 +7,13 @@ from .forms import UploadForm
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
-from .serializers import FileSerializer
+from .serializers import UploadSerializers
 import os
+import json
+from pymongo import MongoClient
+
+# Establish a connection to MongoDB
+client = MongoClient('mongodb://localhost:27017/')  # Update the connection string as per your MongoDB setup
 
 
 def createJson(request):
@@ -47,13 +52,21 @@ def responseHelper():
     elif context[0] == '422':
         return JsonResponse({'error': {'code': 422, 'message': f'{context[1]}'}}, status=422)
     else:
+        json_res_temp = json.dumps(context[0])
+        json_res = json.loads(json_res_temp)
+
+        print(type(json_res))
+        db = client['json_response']
+        collection = db['json_response']
+        result = collection.insert_one(json_res)
         return Response(context)
 
 
 class FileUploadViewSet(viewsets.ViewSet):
 
     def create(self, request):
-        serializer_class = FileSerializer(data=request.data)
+
+        serializer_class = UploadSerializers(data=request.data)
         if 'file' not in request.FILES or not serializer_class.is_valid():
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
