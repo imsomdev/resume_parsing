@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import request, JsonResponse, HttpResponse
 from django.shortcuts import render
-from django.urls import reverse
 from parse.json_script import parse
 from parse.delete_file import delete
 from .forms import UploadForm
@@ -41,13 +40,12 @@ def responseHelper():
     path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/'
     context = parse(path)
     delete(path)
-    if context == '400_AGE':
-        return JsonResponse({'error': {'code': 400, 'message': 'Invalid Age'}}, status=400)
-    if context == '404_DOB':
-        return JsonResponse({'error': {'code': 404, 'message': 'The key Date of Birth was not found.'}}, status=404)
-    if context[0] == '404':
+    if context[0] == '400':
+        return JsonResponse({'error': {'code': 400, 'message': f'Invalid {context[1]}'}}, status=400)
+    elif context[0] == '404':
         return JsonResponse({'error': {'code': 404, 'message': f'The key {context[1]} was not found.'}}, status=404)
-    return Response(context)
+    else:
+        return Response(context)
 
 
 class FileUploadViewSet(viewsets.ViewSet):

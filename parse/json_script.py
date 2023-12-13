@@ -5,7 +5,6 @@ from openai import OpenAI
 from datetime import datetime
 import json
 
-os.environ["OPENAI_API_KEY"] = "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"
 def parse(path):
     def pdf_parse(file_path):
         text = ''
@@ -34,7 +33,7 @@ def parse(path):
                     dump.append(docx_parse(file_path))
         return dump
 
-    # path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/test2'
+    
     result = process_files_in_folder(path)
 
 
@@ -47,14 +46,14 @@ def parse(path):
             model="gpt-3.5-turbo-1106",
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": "You are a helpful assistant designed to output JSON. And maintain same variable name and format always,"},
+                {"role": "system", "content": "You are a helpful assistant designed to output JSON. And maintain same variable name and format always like dateOfBirth, GPA, name, address, education, phone, email "},
                 {"role": "user", "content": element}
             ]
         )
     res = response.choices[0].message.content
     json_res = json.loads(res)
-    print(json_res)
-    # Using json_data and target key found date_of_birth
+   
+    # Using json_data and target key found that value is present or not
     def find_key_value(data, target_key):
         if isinstance(data, dict):
             for key, value in data.items():
@@ -79,19 +78,22 @@ def parse(path):
         return age
     
     # Validating basic details
-    basic_target_key_list = ['name', 'email', 'phone']
-    for target_key in basic_target_key_list:
-        if find_key_value(json_res, target_key) is None:
-            return ['404',f'{target_key.capitalize()}']
-
-    target_key = 'dateOfBirth'
-    dob = find_key_value(json_res, target_key)
-    if dob is None:
-        return '404_DOB'
-    age = calculate_age(dob)
+    basic_target_key_list = ['name', 'email', 'phone', 'dateOfBirth', 'address', 'education', 'GPA']
+    details = {}
+    for basic_key in basic_target_key_list:
+        value = find_key_value(json_res, basic_key)
+        if value is None:
+            return ['404', f'{basic_key.capitalize()}']
+        else:
+            details[basic_key] = value
 
     # Validating age here
-    if age <18:
-        return '400_AGE'
-    return json_res
+    age = calculate_age(details['dateOfBirth'])
+    if age < 18:
+        return ['400', 'age']
 
+    # Validating gpa here
+    if details['GPA'] < 3:
+        return ['400', 'GPA']
+    
+    return [json_res]
