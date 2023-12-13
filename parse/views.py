@@ -21,7 +21,7 @@ def createJson(request):
 def uploadFile(request):
     if request.method == 'POST':
         form = UploadForm(request.POST,request.FILES)
-        file_name = request.FILES['file'].name
+        # file_name = request.FILES['file'].name
         # print(file_name)
         if form.is_valid():
             form.save()
@@ -44,6 +44,8 @@ def responseHelper():
         return JsonResponse({'error': {'code': 400, 'message': f'Invalid {context[1]}'}}, status=400)
     elif context[0] == '404':
         return JsonResponse({'error': {'code': 404, 'message': f'The key {context[1]} was not found.'}}, status=404)
+    elif context[0] == '422':
+        return JsonResponse({'error': {'code': 422, 'message': f'{context[1]}'}}, status=422)
     else:
         return Response(context)
 
@@ -56,7 +58,6 @@ class FileUploadViewSet(viewsets.ViewSet):
             return Response(status=status.HTTP_400_BAD_REQUEST)
         else:
             handle_uploaded_file(request.FILES['file'])
-            # res = 
             return responseHelper()
 
 

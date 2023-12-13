@@ -5,7 +5,9 @@ from openai import OpenAI
 from datetime import datetime
 import json
 
+
 def parse(path):
+    # Extract text from pdf
     def pdf_parse(file_path):
         text = ''
         with pdfplumber.open(file_path) as pdf:
@@ -14,17 +16,16 @@ def parse(path):
                 text += page.extract_text()
         return text
 
-
+    # Extract text from docx
     def docx_parse(file_path):
         text = docx2txt.process(file_path)
         return text
 
-
+    # Checking the file type and calling functions accordingly
     def process_files_in_folder(path):
         dump = []
         for filename in os.listdir(path):
             file_path = os.path.join(path, filename)
-
             if os.path.isfile(file_path):
                 base_name, file_extension = os.path.splitext(filename)
                 if file_extension.lower() == ".pdf":
@@ -35,12 +36,16 @@ def parse(path):
 
     
     result = process_files_in_folder(path)
+    
+    # Invalid file type check. Result list will be empty.
+    if not result:
+        return ['422', 'Unsupported File Type, Please Provide PDF or DOCX']
 
 
     client = OpenAI()
     api = os.environ.get("OPENAI_API_KEY")
 
-
+    # Proccessing the extracted text to make it into json format
     for element in result:
         response = client.chat.completions.create(
             model="gpt-3.5-turbo-1106",
@@ -52,7 +57,7 @@ def parse(path):
         )
     res = response.choices[0].message.content
     json_res = json.loads(res)
-   
+    print(json_res)
     # Using json_data and target key found that value is present or not
     def find_key_value(data, target_key):
         if isinstance(data, dict):
