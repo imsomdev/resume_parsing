@@ -12,7 +12,7 @@ import os
 import json
 from pymongo import MongoClient
 # Establish a connection to MongoDB
-
+client = MongoClient('localhost') 
 
 def createJson(request):
     path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/'
