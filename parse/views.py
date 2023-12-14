@@ -11,9 +11,7 @@ from .serializers import UploadSerializers
 import os
 import json
 from pymongo import MongoClient
-
 # Establish a connection to MongoDB
-client = MongoClient('mongodb://localhost:27017/')  # Update the connection string as per your MongoDB setup
 
 
 def createJson(request):
@@ -52,14 +50,13 @@ def responseHelper():
     elif context[0] == '422':
         return JsonResponse({'error': {'code': 422, 'message': f'{context[1]}'}}, status=422)
     else:
+        # Converting and loading the json data
         json_res_temp = json.dumps(context[0])
         json_res = json.loads(json_res_temp)
-
-        print(type(json_res))
         db = client['json_response']
         collection = db['json_response']
         result = collection.insert_one(json_res)
-        return Response(context)
+        return Response(context) # returning the json response
 
 
 class FileUploadViewSet(viewsets.ViewSet):

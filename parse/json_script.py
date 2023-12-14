@@ -4,7 +4,7 @@ import docx2txt
 from openai import OpenAI
 from datetime import datetime
 import json
-os.environ["OPENAI_API_KEY"] = "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"
+
 
 def parse(path):
     # Extract text from pdf
@@ -36,10 +36,14 @@ def parse(path):
 
     
     result = process_files_in_folder(path)
-    
+
     # Invalid file type check. Result list will be empty.
     if not result:
-        return ['422', 'Unsupported File Type, Please Provide PDF or DOCX']
+        return ['422', 'Unsupported!! Please Provide PDF or DOCX']
+    
+    # Damaged file check
+    if result[0] == '':
+        return ['422', 'Damaged File!!']
 
 
     client = OpenAI()
@@ -51,7 +55,7 @@ def parse(path):
             model="gpt-3.5-turbo-1106",
             response_format={"type": "json_object"},
             messages=[
-                {"role": "system", "content": "You are a helpful assistant designed to output JSON. And maintain same variable name and format always like dateOfBirth, GPA, name, address, education, phone, email "},
+                {"role": "system", "content": "You are a helpful assistant designed to output JSON. And maintain same variable name and format always like dateOfBirth, GPA, name, address, education, phone, email. Don't make up"},
                 {"role": "user", "content": element}
             ]
         )
@@ -100,7 +104,7 @@ def parse(path):
         return ['400', 'age']
 
     # Validating gpa here
-    if details['GPA'] < 3:
+    if float(details['GPA']) < 3.0:
         return ['400', 'GPA']
     
     return [json_res]
