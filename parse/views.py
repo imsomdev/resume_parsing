@@ -11,8 +11,12 @@ from .serializers import UploadSerializers
 import os
 import json
 from pymongo import MongoClient
+from dotenv import load_dotenv
+load_dotenv()
 # Establish a connection to MongoDB
-client = MongoClient('localhost') 
+server = os.getenv('MONGODB_SERVER')
+client = MongoClient(server)  # Update the connection string as per your MongoDB setup
+
 
 def createJson(request):
     path = '/media/somdev/84AE09BCAE09A82E/SentientGeeks/SentientGeeks/Resume Parsing/upload_and_parse/parse_api/parse_api/media/documents/'
@@ -24,8 +28,6 @@ def createJson(request):
 def uploadFile(request):
     if request.method == 'POST':
         form = UploadForm(request.POST,request.FILES)
-        # file_name = request.FILES['file'].name
-        # print(file_name)
         if form.is_valid():
             form.save()
         return redirect ('createJson')

@@ -4,6 +4,8 @@ import docx2txt
 from openai import OpenAI
 from datetime import datetime
 import json
+from dotenv import load_dotenv
+load_dotenv()
 
 
 def parse(path):
@@ -47,7 +49,7 @@ def parse(path):
 
 
     client = OpenAI()
-    api = os.environ.get("OPENAI_API_KEY")
+    api = os.getenv("OPENAI_API_KEY")
 
     # Proccessing the extracted text to make it into json format
     for element in result:
@@ -61,9 +63,8 @@ def parse(path):
         )
     res = response.choices[0].message.content
     json_res = json.loads(res)
-
-
     print(json_res)
+    
     # Using json_data and target key found that value is present or not
     def find_key_value(data, target_key):
         if isinstance(data, dict):

@@ -1,0 +1,4 @@
+venv
+.env
+r.txt
+db.sqlite3
